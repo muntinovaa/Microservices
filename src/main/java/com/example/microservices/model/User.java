@@ -11,9 +11,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator="seq")
     private Long id;
     private String name;
-
-
-
     public User() {
     }
 
