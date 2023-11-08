@@ -1,6 +1,6 @@
-package com.example.microservices.service;
+package com.example.microservices.configurations;
 
-import com.example.microservices.model.AppProperties;
+import com.example.microservices.configurations.AppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,16 +1,16 @@
-package com.example.microservices.controller;
+package com.example.microservices.user.controller;
 
-import com.example.microservices.model.IP;
-import com.example.microservices.service.MyService;
-import com.example.microservices.service.UserService;
-import com.example.microservices.model.User;
+import com.example.microservices.configurations.MyComponent;
+import com.example.microservices.configurations.IP;
+import com.example.microservices.configurations.MyService;
+import com.example.microservices.user.service.UserService;
+import com.example.microservices.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.*;
 import java.util.List;
 
 @RestController
@@ -22,7 +22,6 @@ public class UserController {
     MyComponent myComponent;
     @Autowired
     MyService myService;
-
     @Autowired
     private Environment env;
 

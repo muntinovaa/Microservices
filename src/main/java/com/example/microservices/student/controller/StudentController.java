@@ -1,0 +1,95 @@
+package com.example.microservices.student.controller;
+
+import com.example.microservices.student.model.Student;
+import com.example.microservices.student.model.Teacher;
+import com.example.microservices.student.repository.StudentRepository;
+import com.example.microservices.student.repository.TeacherRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/school")
+public class StudentController {
+
+    @Autowired
+    TeacherRepository teacherRepository;
+
+    @Autowired
+    StudentRepository studentRepository;
+
+    @Autowired
+    public StudentController(StudentRepository studentRepository, TeacherRepository teacherRepository) {
+        this.studentRepository = studentRepository;
+        this.teacherRepository = teacherRepository;
+    }
+
+    // Create a new student
+    @PostMapping("/students")
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
+        Student savedStudent = studentRepository.save(student);
+        return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
+    }
+
+    // Get a single student by ID
+    @GetMapping("/students/{id}")
+    public ResponseEntity<Student> getStudentById(@PathVariable long id) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+        return ResponseEntity.ok(student);
+    }
+
+
+    // Get all students
+    @GetMapping("/students")
+    public ResponseEntity<List<Student>> getAllStudents() {
+        List<Student> students = studentRepository.findAll();
+        return ResponseEntity.ok(students); // Return the list with an OK status
+    }
+
+
+    // Update a student
+    @PutMapping("/students/{id}")
+    public ResponseEntity<Student> updateStudent(@PathVariable long id, @RequestBody Student studentDetails) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+
+        // Assuming the Student class has setters for the fields you want to update
+        student.setName(studentDetails.getName());
+        Student updatedStudent = studentRepository.save(student);
+
+        return ResponseEntity.ok(updatedStudent);
+    }
+
+
+    // Delete a student
+    @DeleteMapping("/students/{id}")
+    public ResponseEntity<?> deleteStudent(@PathVariable long id) {
+        return studentRepository.findById(id).map(student -> {
+            studentRepository.delete(student);
+            return ResponseEntity.ok().build(); // Return 200 OK to indicate successful deletion
+        }).orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+    }
+
+    @PostMapping("/school/teacher/{teacherId}/addStudent")
+    public ResponseEntity<Teacher> addStudentToTeacher(@PathVariable Long teacherId, @RequestBody Student student) throws Exception {
+        // Find the teacher by id
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new Exception("Teacher not found with id: " + teacherId));
+
+        // Save the student if it's new
+        if (student.getId()==0 || !studentRepository.existsById(student.getId())) {
+            studentRepository.save(student);
+        }
+
+        // Add the student to the teacher's list
+        teacher.getStudents().add(student);
+        teacherRepository.save(teacher);
+
+        // Return the updated teacher
+        return new ResponseEntity<>(teacher, HttpStatus.OK);
+    }
+}

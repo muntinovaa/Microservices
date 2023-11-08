@@ -1,7 +1,7 @@
-package com.example.microservices.service;
+package com.example.microservices.user.service;
 
-import com.example.microservices.repository.UserRepository;
-import com.example.microservices.model.User;
+import com.example.microservices.user.repository.UserRepository;
+import com.example.microservices.user.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.ParameterMode;
 import jakarta.persistence.PersistenceContext;

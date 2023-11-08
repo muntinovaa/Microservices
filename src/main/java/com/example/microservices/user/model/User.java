@@ -1,4 +1,4 @@
-package com.example.microservices.model;
+package com.example.microservices.user.model;
 
 
 import jakarta.persistence.*;
