@@ -1,4 +1,4 @@
-package com.example.microservices.student.model;
+package com.example.microservices.school.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

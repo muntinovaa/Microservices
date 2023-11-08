@@ -1,4 +1,4 @@
-package com.example.microservices.student.model;
+package com.example.microservices.school.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -28,7 +28,7 @@ public class Student {
         this.teachers = teachers;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

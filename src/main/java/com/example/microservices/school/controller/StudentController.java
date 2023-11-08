@@ -1,14 +1,16 @@
-package com.example.microservices.student.controller;
+package com.example.microservices.school.controller;
 
-import com.example.microservices.student.model.Student;
-import com.example.microservices.student.model.Teacher;
-import com.example.microservices.student.repository.StudentRepository;
-import com.example.microservices.student.repository.TeacherRepository;
+import com.example.microservices.school.model.Student;
+import com.example.microservices.school.model.Teacher;
+import com.example.microservices.school.repository.TeacherRepository;
+import com.example.microservices.school.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -38,10 +40,9 @@ public class StudentController {
     @GetMapping("/students/{id}")
     public ResponseEntity<Student> getStudentById(@PathVariable long id) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+                                           .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
         return ResponseEntity.ok(student);
     }
-
 
     // Get all students
     @GetMapping("/students")
@@ -49,7 +50,6 @@ public class StudentController {
         List<Student> students = studentRepository.findAll();
         return ResponseEntity.ok(students); // Return the list with an OK status
     }
-
 
     // Update a student
     @PutMapping("/students/{id}")
@@ -64,32 +64,32 @@ public class StudentController {
         return ResponseEntity.ok(updatedStudent);
     }
 
-
     // Delete a student
     @DeleteMapping("/students/{id}")
     public ResponseEntity<?> deleteStudent(@PathVariable long id) {
         return studentRepository.findById(id).map(student -> {
-            studentRepository.delete(student);
+               studentRepository.delete(student);
             return ResponseEntity.ok().build(); // Return 200 OK to indicate successful deletion
         }).orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
     }
 
-    @PostMapping("/school/teacher/{teacherId}/addStudent")
-    public ResponseEntity<Teacher> addStudentToTeacher(@PathVariable Long teacherId, @RequestBody Student student) throws Exception {
-        // Find the teacher by id
+    // GET request to retrieve the list of students for a given teacher
+    @GetMapping("/teacher/{teacherId}/students")
+    public ResponseEntity<List<Student>> getStudentsByTeacherId(@PathVariable Long teacherId) {
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new Exception("Teacher not found with id: " + teacherId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Teacher not found"));
 
-        // Save the student if it's new
-        if (student.getId()==0 || !studentRepository.existsById(student.getId())) {
-            studentRepository.save(student);
-        }
+        List<Student> students = new ArrayList<>(teacher.getStudents());
+        return ResponseEntity.ok(students);
+    }
 
-        // Add the student to the teacher's list
-        teacher.getStudents().add(student);
-        teacherRepository.save(teacher);
+    // GET request to retrieve the list of teachers for a given student
+    @GetMapping("/student/{studentId}/teachers")
+    public ResponseEntity<List<Teacher>> getTeachersByStudentId(@PathVariable Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
 
-        // Return the updated teacher
-        return new ResponseEntity<>(teacher, HttpStatus.OK);
+        List<Teacher> teachers = new ArrayList<>(student.getTeachers());
+        return ResponseEntity.ok(teachers);
     }
 }
