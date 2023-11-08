@@ -56,11 +56,9 @@ public class StudentController {
     public ResponseEntity<Student> updateStudent(@PathVariable long id, @RequestBody Student studentDetails) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
-
         // Assuming the Student class has setters for the fields you want to update
         student.setName(studentDetails.getName());
         Student updatedStudent = studentRepository.save(student);
-
         return ResponseEntity.ok(updatedStudent);
     }
 
@@ -73,23 +71,5 @@ public class StudentController {
         }).orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
     }
 
-    // GET request to retrieve the list of students for a given teacher
-    @GetMapping("/teacher/{teacherId}/students")
-    public ResponseEntity<List<Student>> getStudentsByTeacherId(@PathVariable Long teacherId) {
-        Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Teacher not found"));
 
-        List<Student> students = new ArrayList<>(teacher.getStudents());
-        return ResponseEntity.ok(students);
-    }
-
-    // GET request to retrieve the list of teachers for a given student
-    @GetMapping("/student/{studentId}/teachers")
-    public ResponseEntity<List<Teacher>> getTeachersByStudentId(@PathVariable Long studentId) {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
-
-        List<Teacher> teachers = new ArrayList<>(student.getTeachers());
-        return ResponseEntity.ok(teachers);
-    }
 }
